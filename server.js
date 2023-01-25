@@ -7,9 +7,7 @@ require('console.table');
 init();
 function init() {
   const mainText = main({ name: "Employee Manager", logoColor: "bold-cyan", borderColor: "bold-yellow"}).render();
-
   console.log(mainText);
-
   promptUser();
 }
 
@@ -21,47 +19,45 @@ function promptUser() {
         name: 'choice',
         message: 'Please select an option',
         choices: [
-          { name: 'View ALL Employees',
-            value: 'VIEW_EMPLOYEES'
-          },
-          { name: 'View ALL Roles',
-            value: 'VIEW_ROLES'
-          },
-          { name: 'View ALL Departments',
-            value: 'VIEW_DEPARTMENTS'
-          },
-          // Bonus
-          { name: 'View ALL Employees by Department',
-            value: 'VIEW_EMPLOYEES_BY_DEPARTMENT'
-          },
-          { name: 'View Department Budget',
-            value: 'VIEW_DEPARTMENT_BUDGET'
-          }, //
           { name: "Add Employee",
             value: "ADD_EMPLOYEE"
           },
-          { name: "Add Role",
-            value: "ADD_ROLE"
+          { name: 'View ALL Employees',
+            value: 'VIEW_EMPLOYEES'
           },
-          { name: "Add Department",
-            value: "ADD_DEPARTMENT"
-          },
-          { name: 'Update Employee Role',
-            value: 'UPDATE_EMPLOYEE_ROLE'
-          },
-          // Bonus
           { name: 'Update Employee Manager',
             value: 'UPDATE_EMPLOYEE_MANAGER'
           },
           { name: 'Remove Employee',
             value: 'REMOVE_EMPLOYEE'
           },
+          { name: "Add Role",
+            value: "ADD_ROLE"
+          },
+          { name: 'View ALL Roles',
+            value: 'VIEW_ROLES'
+          },
+          { name: 'Update Employee Role',
+            value: 'UPDATE_EMPLOYEE_ROLE'
+          },
           { name: 'Remove Role',
             value: 'REMOVE_ROLE'
           },
+          { name: "Add Department",
+            value: "ADD_DEPARTMENT"
+          },
+          { name: 'View ALL Departments',
+            value: 'VIEW_DEPARTMENTS'
+          },
+          { name: 'View ALL Employees by Department',
+            value: 'VIEW_EMPLOYEES_BY_DEPARTMENT'
+          },
+          { name: 'View Department Budget',
+            value: 'VIEW_DEPARTMENT_BUDGET'
+          },
           { name: 'Remove Department',
             value: 'REMOVE_DEPARTMENT'
-          }, //
+          },
           { name: 'Quit',
             value: 'QUIT'
           }
@@ -70,9 +66,23 @@ function promptUser() {
     ]).then(res => {
             let choice =res.choice; 
             switch (choice) {
+              case 'ADD_EMPLOYEE': addEmployee();
+                break;
               case 'VIEW_EMPLOYEES': viewEmployees();
                 break;
+              case 'UPDATE_EMPLOYEE_MANAGER': updateEmployeeManager();
+                break;
+              case 'UPDATE_EMPLOYEE_ROLE': updateEmployeeRole();
+                break;
+              case 'REMOVE_EMPLOYEE': removeEmployee();
+                break;
+              case 'ADD_ROLE': addRole();
+                break;
               case 'VIEW_ROLES': viewRoles();
+                break;
+              case 'REMOVE_ROLE': removeRole();
+                break;
+              case 'ADD_DEPARTMENT': addDepartment();
                 break;
               case 'VIEW_DEPARTMENTS': viewDepartments();
                 break;
@@ -80,93 +90,12 @@ function promptUser() {
                 break;
               case 'VIEW_DEPARTMENT_BUDGET': viewDepartmentBudget();
                 break;
-              case 'ADD_EMPLOYEE': addEmployee();
-                break;
-              case 'ADD_ROLE': addRole();
-                break;
-              case 'ADD_DEPARTMENT': addDepartment();
-                break;
-              case 'UPDATE_EMPLOYEE_ROLE': updateEmployeeRole();
-                break;
-              case 'UPDATE_EMPLOYEE_MANAGER': updateEmployeeManager();
-                break;
-              case 'REMOVE_EMPLOYEE': removeEmployee();
-                break;
-              case 'REMOVE_ROLE': removeRole();
-                break;
               case 'REMOVE_DEPARTMENT': removeDepartment();
                 break;
               default:
                 quit();  
             }
           })
-}
-
-// View all employees, all roles, all departments
-function viewEmployees() {
-  db.allEmployees()
-    .then(([rows]) => {
-      let employees = rows;
-      console.log('\n');
-      console.table(employees);
-    }).then(() => promptUser());
-    }
-
-function viewRoles() {
-  db.allRoles()
-    .then(([rows]) => {
-      let roles = rows;
-      console.log('\n');
-      console.table(roles);
-    }).then(() => promptUser());
-}
-
-function viewDepartments() {
-  db.allDepartments()
-    .then(([rows]) => {
-      let departments = rows;
-      console.log('\n');
-      console.table(departments);
-    }).then(() => promptUser());
-}
-
-//view emp by dept
-function viewEmployeesByDepartment() {
-  db.allDepartments()
-    .then(([rows]) => {
-      let departments = rows;
-      const departmentChoices = departments.map(({ id, name }) => ({
-        name: name,
-        value: id
-      }));
-
-      inquirer.prompt([
-        {
-          type: 'list',
-          name: 'departmentId',
-          message: 'Select department you wish to see employees',
-          choices: departmentChoices
-        }
-      ])
-        .then(res => db.allEmployeesByDepartment(res.departmentId))
-        .then(([rows]) => {
-          let employees = rows;
-          console.log('\n');
-          console.table(employees);
-        })
-        .then(() => promptUser())
-    });
-}
-
-//view department budget
-function viewDepartmentBudget() {
-  db.viewDepartmentBudget()
-  .then(([rows]) => {
-    let budget = rows;
-    console.log('\n');
-    console.log(budget);
-  })
-  .then(() => promptUser());
 }
 
 //add employee
@@ -232,6 +161,44 @@ function addEmployee() {
     })
 }
 
+//view emp by dept
+function viewEmployeesByDepartment() {
+  db.allDepartments()
+    .then(([rows]) => {
+      let departments = rows;
+      const departmentChoices = departments.map(({ id, name }) => ({
+        name: name,
+        value: id
+      }));
+
+      inquirer.prompt([
+        {
+          type: 'list',
+          name: 'departmentId',
+          message: 'Select department you wish to see employees',
+          choices: departmentChoices
+        }
+      ])
+        .then(res => db.allEmployeesByDepartment(res.departmentId))
+        .then(([rows]) => {
+          let employees = rows;
+          console.log('\n');
+          console.table(employees);
+        })
+        .then(() => promptUser())
+    });
+}
+
+// View all employees
+function viewEmployees() {
+  db.allEmployees()
+    .then(([rows]) => {
+      let employees = rows;
+      console.log('\n');
+      console.table(employees);
+    }).then(() => promptUser());
+    }
+
 //add role
 function addRole() {
   db.allDepartments()
@@ -266,135 +233,17 @@ function addRole() {
     })
 }
 
-//add department
-function addDepartment() {
-  inquirer.prompt([
-    {
-      name: 'name',
-      message: 'Enter new department name:'
-    }
-  ])
-    .then(res => {
-      let name = res;
-      db.createDepartment(name)
-        .then(() => console.log(`Department ${name.name} has been added!`))
-        .then(() => promptUser())
-    })
-}
-
-//update employee role
-function updateEmployeeRole() {
-  db.allEmployees()
+//view all roles
+function viewRoles() {
+  db.allRoles()
     .then(([rows]) => {
-      let employees = rows;
-      const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
-        name: `${first_name} ${last_name}`,
-        value: id
-      }));
-
-      inquirer.prompt([
-        {
-          type: 'list',
-          name: 'employeeId',
-          message: 'Select employee to update role:',
-          choices: employeeChoices
-        }
-      ])
-        .then(res => {
-          let employeeId = res.employeeId;
-          db.allRoles()
-            .then(([rows]) => {
-              let roles = rows;
-              const roleChoices = roles.map(({ id, title }) => ({
-                name: title,
-                value: id
-              }));
-
-              inquirer.prompt([
-                {
-                  type: 'list',
-                  name: 'roleId',
-                  message: "Select employee's new role",
-                  choices: roleChoices
-                }
-              ])
-                .then(res => db.updateEmployeeRole(employeeId, res.roleId))
-                .then(() => console.log('Employee role has been updated!'))
-                .then(() => promptUser())
-            });
-        });
-    })
+      let roles = rows;
+      console.log('\n');
+      console.table(roles);
+    }).then(() => promptUser());
 }
 
-// Update an employee's manager
-function updateEmployeeManager() {
-  db.allEmployees()
-    .then(([rows]) => {
-      let employees = rows;
-      const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
-        name: `${first_name} ${last_name}`,
-        value: id
-      }));
-
-      inquirer.prompt([
-        {
-          type: 'list',
-          name: 'employeeId',
-          message: "Select employee's manager to update:",
-          choices: employeeChoices
-        }
-      ])
-        .then(res => {
-          let employeeId = res.employeeId
-          db.allManagers(employeeId)
-            .then(([rows]) => {
-              let managers = rows;
-              const managerChoices = managers.map(({ id, first_name, last_name }) => ({
-                name: `${first_name} ${last_name}`,
-                value: id
-              }));
-
-              inquirer.prompt([
-                {
-                  type: 'list',
-                  name: 'managerId',
-                  message:
-                    "Select new manager for employee:",
-                  choices: managerChoices
-                }
-              ])
-                .then(res => db.updateEmployeeManager(employeeId, res.managerId))
-                .then(() => console.log("Employee's manager has been updated!"))
-                .then(() => promptUser())
-            })
-        })
-    })
-}
-
-// remove employee, role, department
-function removeEmployee() {
-  db.allEmployees()
-    .then(([rows]) => {
-      let employees = rows;
-      const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
-        name: `${first_name} ${last_name}`,
-        value: id
-      }));
-
-      inquirer.prompt([
-        {
-          type: 'list',
-          name: 'employeeId',
-          message: "Select employee to remove:",
-          choices: employeeChoices
-        }
-      ])
-        .then(res => db.removeEmployee(res.employeeId))
-        .then(() => console.log("Employee has been removed!"))
-        .then(() => promptUser())
-    })
-}
-
+//Delete a role
 function removeRole() {
   db.allRoles()
     .then(([rows]) => {
@@ -417,6 +266,43 @@ function removeRole() {
         .then(() => console.log("Role has been removed!"))
         .then(() => promptUser())
     })
+}
+
+//add department
+function addDepartment() {
+  inquirer.prompt([
+    {
+      name: 'name',
+      message: 'Enter new department name:'
+    }
+  ])
+    .then(res => {
+      let name = res;
+      db.createDepartment(name)
+        .then(() => console.log(`Department ${name.name} has been added!`))
+        .then(() => promptUser())
+    })
+}
+
+//view department budget
+function viewDepartmentBudget() {
+  db.viewDepartmentBudget()
+  .then(([rows]) => {
+    let budget = rows;
+    console.log('\n');
+    console.log(budget);
+  })
+  .then(() => promptUser());
+}
+
+//view all departments
+function viewDepartments() {
+  db.allDepartments()
+    .then(([rows]) => {
+      let departments = rows;
+      console.log('\n');
+      console.table(departments);
+    }).then(() => promptUser());
 }
 
 // Delete a department
